@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+module ::ShinyChef
+
+srcdir = File.expand_path(File.dirname(__FILE__)) << "/../src/ShinyChef/"
+require srcdir + 'Logger'
+require srcdir + 'Parsers/RecipesLexer'
+require srcdir + 'Parsers/RecipesParser'
+require srcdir + 'Parsers/InstructionsLexer'
+require srcdir + 'Parsers/InstructionsParser'
+require srcdir + 'Parsers/IngredientsLexer'
+require srcdir + 'Parsers/IngredientsParser'
+require srcdir + 'RecipeState'
+require srcdir + 'Ingredient'
+require srcdir + 'FileParser'
+require srcdir + 'ContainerHolder'
+require srcdir + 'Container'
+require srcdir + 'Bowls'
+require srcdir + 'Dishes'
+require srcdir + "Chef"
+
+abort "Use: #{__FILE__} <filename>" unless ARGV.length == 1
+parser = FileParser.new \
+    ARGV[0], \
+    Parsers::Recipes::Parser, \
+    Parsers::Ingredients::Parser, \
+    Parsers::Instructions::Parser
+
+recipes = parser.parse ARGV[0]
+
+# Go!
+main_recipe = parser.main_recipe
+bowls = Bowls.new
+dishes = Dishes.new
+chef = Chef.new
+chef.cook(recipes, main_recipe, bowls, dishes)
+end
